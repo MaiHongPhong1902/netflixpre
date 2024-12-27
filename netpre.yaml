@@ -1,0 +1,85 @@
+mitm:
+  enabled: true
+  ca_p12: Shadowrocket.p12
+  ca_passphrase: Shadowrocket
+  dns:
+    primary: 223.5.5.5
+    secondary: 119.29.29.29
+  hostnames:
+    - www.google.cn
+    - "*.wikipedia.org"
+    - "*.wikiwand.com"
+    - "*.byteoversea.com"
+    - "*.tiktokv.com"
+    - "*.tik-tokapi.com"
+    - "*.googlevideo.com"
+    - "testflight.apple.com"
+    - "*.21jingji.com"
+    - "*.4gtv.tv"
+    - "*.58.com"
+    - "*.baidu.com"
+    - "*.alicdn.com"
+    - "*.taobao.com"
+    - "*.amemv.com"
+    - "*.snssdk.com"
+
+http_captures:
+  - https://raw.githubusercontent.com/BlueGrave/Shadowrocket/master/Ruleset/WhiteList.list
+  - https://raw.githubusercontent.com/DivineEngine/Profiles/master/Surge/Ruleset/Guard/Advertising.list
+  - https://raw.githubusercontent.com/DivineEngine/Profiles/master/Surge/Ruleset/StreamingMedia/Streaming.list
+  - https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/Netflix/Netflix.list
+  - https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Shadowrocket/YouTube/YouTube.list
+
+header_rewrites:
+  - delete:
+      match: ^https?:\/\/(www.)?google\.cn
+      replacement: https://www.google.com
+  - delete:
+      match: ^https?:\/\/api.revenuecat.com\/.+/(receipts$|subscribers/?(.*?)*$)
+      name: X-RevenueCat-ETag
+      type: request
+
+scriptings:
+  - http_request:
+      name: TestFlight
+      match: ^https?:\/\/testflight\.apple\.com\/v\d\/accounts\/.+?\/install$
+      script_url: https://gist.githubusercontent.com/NobyDa/9be418b93afc5e9c8a8f4d28ae403cf2/raw/TF_Download.js
+      body_required: true
+      update_interval: -1
+  - http_response:
+      name: Netflix
+      match: https:\/\/raw.githubusercontent.com\/blackmatrix7\/ios_rule_script\/master\/rule\/Shadowrocket\/Netflix\/Netflix\.list
+      script_url: https://raw.githubusercontent.com/NetflixScripts/main/Bypass.js
+      body_required: true
+      update_interval: 5
+  - http_response:
+      name: YouTube
+      match: https:\/\/raw.githubusercontent.com\/blackmatrix7\/ios_rule_script\/master\/rule\/Shadowrocket\/YouTube\/YouTube\.list
+      script_url: https://raw.githubusercontent.com/YouTubeScripts/main/NoAds.js
+      body_required: true
+      update_interval: 5
+  - http_response:
+      name: TikTok
+      match: https:\/\/.*\.tiktokv\.com
+      script_url: https://raw.githubusercontent.com/TikTokScripts/main/RegionBypass.js
+      body_required: true
+      update_interval: 5
+
+bypass:
+  - 10.0.0.0/8
+  - 100.64.0.0/10
+  - 127.0.0.0/8
+  - 169.254.0.0/16
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+
+always-real-ip:
+  - "*.srv.nintendo.net"
+  - "*.stun.playstation.net"
+  - "xbox.*.microsoft.com"
+  - "*.xboxlive.com"
+  - "*.nextdns.io"
+
+hijack-dns:
+  - 8.8.8.8:53
+  - 1.1.1.1:53
