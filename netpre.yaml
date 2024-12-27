@@ -1,57 +1,28 @@
-mitm:
-  enabled: true
-  ca_p12: egern.p12
-  ca_passphrase: egern
-  hostnames:
-    - "*.googlevideo.com"
-    - "*.youtube.com"
-    - "youtubei.googleapis.com"
+#!name = YouTube去广告
 
-http_captures:
-  - https://youtubei.googleapis.com/youtubei/v1/browse
-  - https://youtubei.googleapis.com/youtubei/v1/next
-  - https://youtubei.googleapis.com/youtubei/v1/player
-  - https://youtubei.googleapis.com/youtubei/v1/reel/reel_watch_sequence
-  - https://youtubei.googleapis.com/youtubei/v1/get_watch
+#!desc =支持pip，后台播放
 
-header_rewrites:
-  - delete:
-      match: ^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads|videoplayback\?).+&oad
-      replacement: reject-200
-  - delete:
-      match: ^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads
-      replacement: reject-200
-  - delete:
-      match: ^https?:\/\/(www|s)\.youtube\.com\/(pagead|ptracking)
-      replacement: reject-200
-  - delete:
-      match: ^https?:\/\/s\.youtube\.com\/api\/stats\/qoe\?adcontext
-      replacement: reject-200
+#!author = Maasea 
 
-url_rewrites:
-  - match: ^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?&ctier=L(&.+?),ctier,(.+)
-    replacement: $1$2$3
-  - match: ^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad
-    replacement: reject-200
-  - match: ^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads
-    replacement: reject-200
-  - match: ^https?:\/\/(www|s)\.youtube\.com\/(pagead|ptracking)
-    replacement: reject-200
-  - match: ^https?:\/\/s\.youtube\.com\/api\/stats\/qoe\?adcontext
-    replacement: reject-200
+#!homepage=https://whatshub.top
 
-scriptings:
-  - http_request:
-      name: YouTube Request
-      match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|reel\/reel_watch_sequence|get_watch)
-      script_url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/dist/youtube.request.preview.js
-      body_required: true
-      update_interval: -1
-  - http_response:
-      name: YouTube Response
-      match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch)
-      script_url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/dist/youtube.response.preview.js
-      body_required: true
-      update_interval: -1
-      argument: >
-        {"lyricLang":"en","captionLang":"en","blockUpload":false,"blockImmersive":false,"debug":false}
+#!icon = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png
+
+
+[Rule]
+AND,((DOMAIN-SUFFIX,googlevideo.com), (PROTOCOL,UDP)),REJECT
+AND,((DOMAIN,youtubei.googleapis.com), (PROTOCOL,UDP)),REJECT
+
+[URL Rewrite]
+(^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+) $1$2$3 302
+^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad _ reject-200
+^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads _ reject-200
+^https?:\/\/(www|s)\.youtube\.com\/(pagead|ptracking) _ reject-200
+^https?:\/\/s\.youtube\.com\/api\/stats\/qoe\?adcontext _ reject-200
+
+[Script]
+youtube.request = type=http-request,pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|reel\/reel_watch_sequence|get_watch),requires-body=1,max-size=-1,binary-body-mode=1,engine={{{脚本执行引擎}}},script-path=https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/dist/youtube.request.preview.js
+youtube.response = type=http-response,pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch),requires-body=1,max-size=-1,binary-body-mode=1,engine={{{脚本执行引擎}}},script-path=https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/dist/youtube.response.preview.js,argument="{"lyricLang":"{{{歌词翻译语言}}}","captionLang":"{{{字幕翻译语言}}}","blockUpload":{{{屏蔽上传按钮}}},"blockImmersive":{{{屏蔽选段按钮}}},"debug":{{{启用调试模式}}}}"
+
+[MITM]
+hostname = %APPEND% -redirector*.googlevideo.com,*.googlevideo.com,www.youtube.com,s.youtube.com,youtubei.googleapis.com
