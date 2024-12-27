@@ -1,7 +1,7 @@
 mitm:
   enabled: true
-  ca_p12: Shadowrocket.p12
-  ca_passphrase: Shadowrocket
+  ca_p12: egern.p12
+  ca_passphrase: egern
   dns:
     primary: 223.5.5.5
     secondary: 119.29.29.29
