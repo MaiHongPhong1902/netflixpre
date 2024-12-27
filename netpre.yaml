@@ -13,13 +13,10 @@ http_captures:
   - https://youtubei.googleapis.com/youtubei/v1/player
   - https://youtubei.googleapis.com/youtubei/v1/reel/reel_watch_sequence
   - https://youtubei.googleapis.com/youtubei/v1/get_watch
-  - https://youtubei.googleapis.com/youtubei/v1/guide
-  - https://youtubei.googleapis.com/youtubei/v1/account/get_setting
-  - https://youtubei.googleapis.com/youtubei/v1/search
 
 header_rewrites:
   - delete:
-      match: ^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad
+      match: ^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads|videoplayback\?).+&oad
       replacement: reject-200
   - delete:
       match: ^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads
@@ -57,10 +54,4 @@ scriptings:
       body_required: true
       update_interval: -1
       argument: >
-        {
-          "lyricLang":"{{{歌词翻译语言}}}",
-          "captionLang":"{{{字幕翻译语言}}}",
-          "blockUpload":{{{屏蔽上传按钮}}},
-          "blockImmersive":{{{屏蔽选段按钮}}},
-          "debug":{{{启用调试模式}}}}
-        }
+        {"lyricLang":"en","captionLang":"en","blockUpload":false,"blockImmersive":false,"debug":false}
